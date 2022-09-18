@@ -140,15 +140,15 @@ AI企图了解智能的实质，并生产出一种新的能以人类智能相似
     \begin{algorithmic}[1]
         \Procedure{VacuumCleaner}{status, location}
         \If {status = dirty}
-        \State return suck
+        \State \Return suck
         \EndIf
 
         \If {location = A and status = clean}
-        \State return right
+        \State \Return right
         \EndIf
 
         \If {location = B and status = clean}
-        \State return left
+        \State \Return left
         \EndIf
         \EndProcedure
     \end{algorithmic}
@@ -214,3 +214,360 @@ AI企图了解智能的实质，并生产出一种新的能以人类智能相似
 
 \subsection{搜索树（Search Tree）}
 
+搜索树中的每个结点对应于状态空间中的一个状态，边对应着行为，根结点对应于初始状态。\\
+
+搜索树从根结点开始，每次选择一个结点进行扩展（expand），扩展的过程是递归的，直到搜索到目标状态。\\
+
+搜索树中的每个结点由4部分组成：
+
+\begin{enumerate}
+    \item node.State：状态信息（如Sibiu）
+    \item node.Parent：父结点（如Arad），用于回溯
+    \item node.Action：从父结点到当前结点的行为（如ToSibiu）
+    \item node.PathCost：从根结点到当前结点的代价，用于查找最优解
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/C1/1-3/3.png}
+    \caption{搜索树}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{Expand a node}
+    \begin{algorithmic}[1]
+        \Procedure{Expand}{problem, node} yield nodes
+        \State s = node.State
+
+        \For {action in problem.Actions(s)}
+        \State s' = problem.Result(s, action)
+        \State cost = node.PathCost + problem.ActionCost(s, action, s')
+        \State yield Node(State=s', Parent=node, Action=action, PathCost=cost)
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/C1/1-3/4.png}
+\end{figure}
+
+所有已经到达的结点（reached node）都保存在一个哈希表中，以便于避免重复搜索。\\
+
+而所有前沿结点（frontier node）根据不同的搜索策略，可以使用栈、队列或优先队列保存，从而觉得后续需要扩展的结点。
+
+\newpage
+
+\section{盲目搜索策略}
+
+\subsection{广度优先搜索（BFS, Breadth-First Search）}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-4/1.png}
+    \caption{BFS}
+\end{figure}
+
+BFS首先把从源点相邻的顶点遍历，然后再遍历稍微远一点的顶点，再去遍历更远一点的顶点。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=1.5cm,
+            level 1/.style={sibling distance=4cm},
+            level 2/.style={sibling distance=2cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {1}
+        child {
+                node[circle,draw] {2}
+                child {
+                        node[circle,draw] {4}
+                        child {node[circle,draw] {8}}
+                        child {node[circle,draw] {9}}
+                    }
+                child {
+                        node[circle,draw] {5}
+                        child {node[circle,draw] {10}}
+                        child {node[circle,draw] {11}}
+                    }
+            }
+        child {
+                node[circle,draw] {3}
+                child {
+                        node[circle,draw] {6}
+                        child {node[circle,draw] {12}}
+                        child {node[circle,draw] {13}}
+                    }
+                child {
+                        node[circle,draw] {7}
+                        child {node[circle,draw] {14}}
+                        child {node[circle,draw] {15}}
+                    }
+            };
+    \end{tikzpicture}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{BFS}
+    \begin{algorithmic}[1]
+        \Procedure{BFS}{problem} returns a solution node or failure
+        \State node = Node(problem.Initial)
+
+        \If {problem.IsGoal(node.State)}
+        \State \Return node
+        \EndIf
+        \\
+        \State frontier = Queue(node)
+        \State reached = {problem.Initial}
+        \\
+        \While {not IsEmpty(frontier)}
+        \State node = frontier.dequeue()
+        \For {child in Expand(problem, node)}
+        \State s = child.State
+        \If {problem.IsGoal(s)}
+        \State reutnr child
+        \EndIf
+        \If {s is not in reached}
+        \State reached.add(s)
+        \State frontier.enqueue(child)
+        \EndIf
+        \EndFor
+        \EndWhile
+        \\
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^d) $
+    \item 空间复杂度：$ O(b^d) $（最多需要保存最后一层结点的数量）
+    \item 完备性：YES（当$ d $有穷）
+    \item 最优性：YES（总能找到最浅的目标结点）
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection{深度优先搜索（DFS, Depth-First Search）}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-4/2.png}
+    \caption{DFS}
+\end{figure}
+
+深度优先搜索是一种一头扎到底的遍历方法，选择一条路，尽可能不断地深入，遇到死路就回退，回退过程中如果遇到没探索的支路，就进入该支路继续深入。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{scope}[every node/.style={circle,thick,draw}]
+            \node (0) at (2.5,4) {0};
+            \node (1) at (5,3) {1};
+            \node (2) at (2.5,2) {2};
+            \node (3) at (1,0) {3};
+            \node (4) at (3,0) {4};
+            \node (5) at (5,1) {5};
+            \node (6) at (6,-1) {6};
+            \node (7) at (0,3) {7};
+        \end{scope}
+
+        \begin{scope}[>={Stealth[black]},
+            every node/.style={},
+            every edge/.style={draw=black,very thick}]
+            \path [-] (0) edge node {} (1);
+            \path [-] (0) edge node {} (2);
+            \path [-] (0) edge node {} (7);
+            \path [-] (1) edge node {} (4);
+            \path [-] (1) edge node {} (5);
+            \path [-] (2) edge node {} (4);
+            \path [-] (3) edge node {} (4);
+            \path [-] (5) edge node {} (6);
+        \end{scope}
+    \end{tikzpicture}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{DFS}
+    \begin{algorithmic}[1]
+        \Procedure{DFS}{problem} returns a solution node or failure
+        \State node = Node(problem.Initial)
+
+        \If {problem.IsGoal(node.State)}
+        \State \Return node
+        \EndIf
+        \\
+        \State frontier = Stack(node)
+        \\
+        \While {not IsEmpty(frontier)}
+        \State node = frontier.pop()
+        \If {problem.IsGoal(s)}
+        \State reutnr node
+        \EndIf
+        \\
+        \If {not IsCycle(node)}
+        \For {child in Expand(problem, node)}
+        \State frontier.push(child)
+        \EndFor
+        \EndIf
+        \EndWhile
+        \\
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^m) $（当$ m $有穷）
+    \item 空间复杂度：$ O(bm) $（只需要保存一层的兄弟结点）
+    \item 完备性：NO（当$ m $无穷）
+    \item 最优性：NO（只能找到最左解）
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection{深度限制搜索（DLS, Depth-Limit Search）}
+
+DLS是DFS的变体，它限制了访问的深度。因为当树的子树过深时，进行DFS会在该子树上消耗太多的时间，所以在DLS中，若该结点的深度大于限制深度$ l $，那就不再继续遍历其子树了。\\
+
+\begin{algorithm}[H]
+    \caption{DLS}
+    \begin{algorithmic}[1]
+        \Procedure{DLS}{problem, l} returns a solution node or failure or cutoff
+        \State frontier = Stack(problem.Initial)
+        \State result = failure
+        \\
+        \While {not IsEmpty(frontier)}
+        \State node = frontier.pop()
+        \If {Depth(node) > l}
+        \State result = cutoff
+        \ElsIf {not IsCycle(node)}
+        \For {child in Expand(problem, node)}
+        \State frontier.push(child)
+        \EndFor
+        \EndIf
+        \EndWhile
+        \\
+        \State \Return result
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^l) $
+    \item 空间复杂度：$ O(bl) $
+    \item 完备性：NO
+    \item 最优性：NO
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection{迭代加深搜索（IDS, Iterative Deepening Search）}
+
+IDS是DLS的升级版本，即首先允许深度优先搜索$ k $层搜索树，若没有发现可行解，再将$ k + 1 $后重复以上步骤搜索。\\
+
+IDS将DFS的空间优势和BFS的时间优势结合起来，是一种比较好的搜索算法。\\
+
+\begin{algorithm}[H]
+    \caption{IDS}
+    \begin{algorithmic}[1]
+        \Procedure{IDS}{problem} returns a solution node or failure
+        \For {depth = 0 to $ \infty $}
+        \State result = DLS(problem, depth)
+        \If {result != cutoff}
+        \State \Return result
+        \EndIf
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^d) $
+    \item 空间复杂度：$ O(bd) $
+    \item 完备性：YES
+    \item 最优性：YES
+\end{itemize}
+
+\vspace{0.5cm}
+
+IDS很明显存在重复的搜索，在迭代至第$ k $层时，会重复搜索前$ k - 1 $层的所有结点。虽然这的确浪费了一些时间，但是它并没有那么不堪。\\
+
+假设分别计算使用BFS和IDS所生成的结点数量：
+
+\vspace{-1cm}
+
+\begin{align*}
+    N(BFS) & = 1 + b^1 + b^2 + \cdots + b^d                    \\
+    N(IDS) & = (d)b +  (d - 1)b^2 + (d-2)b^3 + \cdots + (1)b^d
+\end{align*}
+
+假设$ b = 10 $，$ d = 5 $时，$ N(BFS) = 111110 $，$ N(IDS) = 123450 $。可以计算得出IDS只比BFS多生成了11\%的结点。
+
+\vspace{-1cm}
+
+\begin{align*}
+    {{N(IDS) - N(BFS)} \over {N(BFS)}} = 11\%
+\end{align*}
+
+因此，IDS只多生成了少量的结点，而节省了大量的空间。\\
+
+\subsection{一致代价搜索（UCS, Uninformed-Cost Search）}
+
+由于不同的行为具有不同的代价，每次选择一个从根结点到当前结点成本最低的路径是一个很好的选择。这被理论计算机科学界称为Dijkstra算法，被AI领域称为统一成本搜索UCS。BFS可以看作是根据树的深度一层一层扩展的，而UCS则是根据树的代价扩展的。\\
+
+在罗马尼亚的部分地图中，问题是从Sibiu到达Bucharest。\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-4/3.png}
+\end{figure}
+
+Sibiu的后继结点是Rimnicu Vilcea和Fagaras，路径成本分别为$ 80 $和$ 99 $。因此扩展代价最低的结点Rimnicu Vilcea，计算得出到Pitesti的路径代价为$ 80 + 97 = 177 $。\\
+
+其次路径代价最低的是Fagaras，计算得出到Bucharest的路径代价为$ 99 + 211 = 310 $。此时，虽然Bucharest是目标状态，但是UCS算法并不会在生成结点时判断其是否为目标状态，而是在扩展结点的时候判断。\\
+
+因此算法会继续选择Pitesti进行扩展，计算得出到Bucharest的路径代价为$ 80 + 97 + 101 = 278 $。这个具有更小的路径代价，因此它替换之前到达这里的路径，并被添加到前沿结点集合中。最终，它在被扩展时发现是目标状态。\\
+
+\begin{algorithm}[H]
+    \caption{UCS}
+    \begin{algorithmic}[1]
+        \Procedure{UCS}{problem} returns a solution node or failure
+        \State \Return BestFirstSearch(problem, PathCost)
+        \EndProcedure
+        \\
+        \Procedure{BestFirstSearch}{problem, PathCost}
+        \State node = Node(problem.Initial)
+        \State frontier = PriorityQueue(node)   \# ordered by PathCost
+        \State reached = \{problem.Initial: node\}
+        \\
+        \While {not IsEmpty(frontier)}
+        \State node = frontier.pop()
+        \If {problem.IsGoal(node.State)}
+        \State \Return node
+        \EndIf
+        \\
+        \For {child in Expand(problem, node)}
+        \State s = child.State
+        \If {s is not in reached or child.PathCost < reached[s].PathCost}
+        \State reached[s] = child
+        \State frontier.push(child)
+        \EndIf
+        \EndFor
+        \EndWhile
+        \\
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^{1 + \lfloor C^* / \epsilon \rfloor}) $
+    \item 空间复杂度：$ O(b^{1 + \lfloor C^* / \epsilon \rfloor}) $
+    \item 完备性：YES
+    \item 最优性：YES
+\end{itemize}
+
+\newpage
