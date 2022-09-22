@@ -216,7 +216,7 @@ AI企图了解智能的实质，并生产出一种新的能以人类智能相似
 
 搜索树中的每个结点对应于状态空间中的一个状态，边对应着行为，根结点对应于初始状态。\\
 
-搜索树从根结点开始，每次选择一个结点进行扩展（expand），扩展的过程是递归的，直到搜索到目标状态。\\
+搜索树从根结点开始，每次选择一个结点进行扩展（expand），扩展的过程是递归的，直到搜索到目标结点。\\
 
 搜索树中的每个结点由4部分组成：
 
@@ -320,14 +320,14 @@ BFS首先把从源点相邻的顶点遍历，然后再遍历稍微远一点的�
         \EndIf
         \\
         \State frontier = Queue(node)
-        \State reached = {problem.Initial}
+        \State reached = \{problem.Initial\}
         \\
-        \While {not IsEmpty(frontier)}
+        \While {not frontier.is\_empty()}
         \State node = frontier.dequeue()
         \For {child in Expand(problem, node)}
         \State s = child.State
         \If {problem.IsGoal(s)}
-        \State reutnr child
+        \State \Return child
         \EndIf
         \If {s is not in reached}
         \State reached.add(s)
@@ -401,10 +401,10 @@ BFS首先把从源点相邻的顶点遍历，然后再遍历稍微远一点的�
         \\
         \State frontier = Stack(node)
         \\
-        \While {not IsEmpty(frontier)}
+        \While {not frontier.is\_empty()}
         \State node = frontier.pop()
         \If {problem.IsGoal(s)}
-        \State reutnr node
+        \State \Return node
         \EndIf
         \\
         \If {not IsCycle(node)}
@@ -439,7 +439,7 @@ DLS是DFS的变体，它限制了访问的深度。因为当树的子树过深�
         \State frontier = Stack(problem.Initial)
         \State result = failure
         \\
-        \While {not IsEmpty(frontier)}
+        \While {not frontier.is\_empty()}
         \State node = frontier.pop()
         \If {Depth(node) > l}
         \State result = cutoff
@@ -527,9 +527,9 @@ IDS很明显存在重复的搜索，在迭代至第$ k $层时，会重复搜索
 
 Sibiu的后继结点是Rimnicu Vilcea和Fagaras，路径成本分别为$ 80 $和$ 99 $。因此扩展代价最低的结点Rimnicu Vilcea，计算得出到Pitesti的路径代价为$ 80 + 97 = 177 $。\\
 
-其次路径代价最低的是Fagaras，计算得出到Bucharest的路径代价为$ 99 + 211 = 310 $。此时，虽然Bucharest是目标状态，但是UCS算法并不会在生成结点时判断其是否为目标状态，而是在扩展结点的时候判断。\\
+其次路径代价最低的是Fagaras，计算得出到Bucharest的路径代价为$ 99 + 211 = 310 $。此时，虽然Bucharest是目标结点，但是UCS算法并不会在生成结点时判断其是否为目标结点，而是在扩展结点的时候判断。\\
 
-因此算法会继续选择Pitesti进行扩展，计算得出到Bucharest的路径代价为$ 80 + 97 + 101 = 278 $。这个具有更小的路径代价，因此它替换之前到达这里的路径，并被添加到前沿结点集合中。最终，它在被扩展时发现是目标状态。\\
+因此算法会继续选择Pitesti进行扩展，计算得出到Bucharest的路径代价为$ 80 + 97 + 101 = 278 $。这个具有更小的路径代价，因此它替换之前到达这里的路径，并被添加到前沿结点集合中。最终，它在被扩展时发现是目标结点。\\
 
 \begin{algorithm}[H]
     \caption{UCS}
@@ -543,7 +543,7 @@ Sibiu的后继结点是Rimnicu Vilcea和Fagaras，路径成本分别为$ 80 $和
         \State frontier = PriorityQueue(node)   \# ordered by PathCost
         \State reached = \{problem.Initial: node\}
         \\
-        \While {not IsEmpty(frontier)}
+        \While {not frontier.is\_empty()}
         \State node = frontier.pop()
         \If {problem.IsGoal(node.State)}
         \State \Return node
@@ -571,3 +571,158 @@ Sibiu的后继结点是Rimnicu Vilcea和Fagaras，路径成本分别为$ 80 $和
 \end{itemize}
 
 \newpage
+
+\section{启发式搜索}
+
+\subsection{启发式搜索（Informed Search）}
+
+盲目搜索只使用问题中提供的信息（如路径代价），而启发式搜索使用额外的信息（如估计值），通过指导向最有希望的方向前进，从而达到减少搜索范围、降低问题复杂度。\\
+
+然而，启发式策略是极易出错的。在解决问题的过程中启发仅仅是下一步将要采取措施的一个猜想，常常根据经验和直觉来判断。启发式函数$ h(n) $（heuristic function）用于表示结点$ n $到达目标结点的最小估计代价。\\
+
+例如在八数码问题中，可以根据处于错误位置的数字的数量来作为引导。\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/C1/1-5/1.png}
+\end{figure}
+
+\vspace{0.5cm}
+
+\subsection{贪婪最佳优先搜索（Greedy Best-First Search）}
+
+所谓贪婪，即只扩展当前代价最小的结点。但是贪心搜索不能保证最优，甚至都不能保证完备，因为它可能陷入死循环。\\
+
+贪心只根据启发进行搜索，即评估函数$ f(n) = h(n) $。\\
+
+假设$ h(n) $是当前城市到Bucharest的直线距离，这个直线距离是原问题所不具备的。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-5/2.png}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|}
+            \hline
+            Bucharest      & 0   \\
+            \hline
+            Fagaras        & 176 \\
+            \hline
+            Pitesti        & 100 \\
+            \hline
+            Rimnicu Vilcea & 193 \\
+            \hline
+            Sibiu          & 253 \\
+            \hline
+        \end{tabular}
+    }
+    \caption{各个城市到Bucharest的直线距离}
+\end{table}
+
+问题是从Sibiu到Bucharest，GBFS算法的搜索过程如下：
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{4mm}{
+        \begin{tabular}{|c|c|c|l|l|}
+            \hline
+            \textbf{Node} & \textbf{IsGoal(Node)} & \textbf{s}  & \textbf{Frontier}      & \textbf{Reached}                     \\
+            \hline
+            $ S $         & NO                    &             & [$ S_{253} $]          & \{$ S_0 $\}                          \\
+            \hline
+            $ S $         & NO                    & $ R_{193} $ & [$ R_{193} $]          & \{$ S_0, R_{80} $\}                  \\
+            \hline
+            $ S $         & NO                    & $ F_{176} $ & [$ R_{193}, F_{176} $] & \{$ S_0, R_{80}, F_{99} $\}          \\
+            \hline
+            $ F $         & NO                    & $ B_0 $     & [$ R_{193}, B_0 $]     & \{$ S_0, R_{80}, F_{99}, B_0 $\}     \\
+            \hline
+            $ F $         & NO                    & $ S_{253} $ & [$ R_{193}, B_0 $]     & \{$ S_0, R_{80}, F_{99}, P_{177} $\} \\
+            \hline
+            $ B $         & YES                   &             &                        &                                      \\
+            \hline
+        \end{tabular}
+    }
+\end{table}
+
+\begin{algorithm}[H]
+    \caption{GBFS}
+    \begin{algorithmic}[1]
+        \Procedure{GBFS}{problem, f} returns a solution node or failure
+        \State node = Node(problem.Initial)
+        \State frontier = PriorityQueue(node)   \# ordered by f
+        \State reached = \{problem.Initial: node\}
+        \\
+        \While {not frontier.is\_empty()}
+        \State node = frontier.pop()
+        \If {problem.IsGoal(node.State)}
+        \State \Return node
+        \EndIf
+        \\
+        \For {child in Expand(problem, node)}
+        \State s = child.State
+        \If {s is not in reached or child.PathCost < reached[s].PathCost}
+        \State reached[s] = child
+        \State frontier.push(child)
+        \EndIf
+        \EndFor
+        \EndWhile
+        \\
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\vspace{0.5cm}
+
+\subsection{A*搜索（A* Search）}
+
+A*搜索的评估函数为$ f(n) = g(n) + h(h) $，其中$ g(n) $是从初始结点到结点$ n $的实际代价，$ h(n) $是从结点$ n $到达目标结点的最小估计代价。\\
+
+启发函数会影响A*搜索的性能。在极端情况下，当$ h(n) = 0 $，则$ g(n) $将决定结点的优先级，此时算法就退化成了UCS。\\
+
+当$ h(n) $始终小于等于结点$ n $到目标结点的实际代价$ h^*(n) $，A*算法保证一定能够找到最短路径。但是$ h(n) $的值越小，算法将遍历越多的结点，导致算法越慢。\\
+
+当$ h(n) $完全等于$ h^*(n) $时，A*算法将很快速地找到最佳路径。可惜并非所有场景下都能做到这一点，因为在到达终点之前，很难确切地算出距离终点的距离。\\
+
+当$ h(n) $远大于$ g(n) $时，此时只有$ h(n) $产生效果，算法也就变成了GBFS。\\
+
+A*算法对于部分罗马尼亚地图的搜索过程如下：
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{0.5mm}{
+        \begin{tabular}{|c|c|c|l|l|}
+            \hline
+            \textbf{Node}   & \textbf{IsGoal} & \textbf{s}      & \textbf{Frontier}             & \textbf{Reached}                                                  \\
+            \hline
+            $ S_{0+253} $   & NO              &                 & [$ S_{0+253} $]               & \{$ S_{0+253} $\}                                                 \\
+            \hline
+            $ S_{0+253} $   & NO              & $ R_{80+193} $  & [$ R_{80+193} $]              & \{$ S_{0+253}, R_{80+193} $\}                                     \\
+            \hline
+            $ S_{0+253} $   & NO              & $ F_{99+176} $  & [$ R_{80+193}, F_{99+176} $]  & \{$ S_{0+253}, R_{80+193}, F_{99+176} $\}                         \\
+            \hline
+            $ R_{80+193} $  & NO              & $ P_{177+100} $ & [$ F_{99+176}, P_{177+100} $] & \{$ S_{0+253}, R_{80+193}, F_{99+176}, P_{177+100} $\}            \\
+            \hline
+            $ R_{80+193} $  & NO              & $ S_{160+253} $ & [$ F_{99+176}, P_{177+100} $] & \{$ S_{0+253}, R_{80+193}, F_{99+176}, P_{177+100} $\}            \\
+            \hline
+            $ F_{99+176} $  & NO              & $ B_{310+0} $   & [$ P_{177+100}, B_{310+0} $]  & \{$ S_{0+253}, R_{80+193}, F_{99+176}, P_{177+100}, B_{310+0} $\} \\
+            \hline
+            $ F_{99+176} $  & NO              & $ S_{198+253} $ & [$ P_{177+100}, B_{310+0} $]  & \{$ S_{0+253}, R_{80+193}, F_{99+176}, P_{177+100}, B_{310+0} $\} \\
+            \hline
+            $ P_{177+100} $ & NO              & $ B_{278+0} $   & [$ B_{310+0}, B_{278+0} $]    & \{$ S_{0+253}, R_{80+193}, F_{99+176}, P_{177+100}, B_{278+0} $\} \\
+            \hline
+            $ B_{278+0} $   & YES             &                 &                               &                                                                   \\
+            \hline
+        \end{tabular}
+    }
+\end{table}
+
+\newpage
+
+\section{局部搜索}
+
+\subsection{局部搜索（Local Search）}
+
