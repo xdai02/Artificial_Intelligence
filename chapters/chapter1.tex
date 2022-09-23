@@ -726,3 +726,156 @@ A*算法对于部分罗马尼亚地图的搜索过程如下：
 
 \subsection{局部搜索（Local Search）}
 
+局部搜索是一种用于解决计算上难以优化的问题（如NP问题）的启发式方法。算法每次从当前解的邻域解空间中选择一个最好邻居作为下次迭代的当前解，直到达到一个局部最优解。\\
+
+传统的N皇后问题使用的是回溯法（backtrack）解决的，但是一旦问题的规模过大，计算时间复杂度是不能够接受的。\\
+
+\subsection{爬山法（Hill Climbing）}
+
+设想去攀登一座山群的最高峰，而此山群有很多的小山峰，且我们对此山群一无所知。那么当我们来到一座小山峰（局部极值点）时，我们会错误地判断这就是最高峰，事实上这有可能是一个很糟糕的解（即与最高峰还差很远）。\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-6/1.png}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{HillClimbing}
+    \begin{algorithmic}[1]
+        \Procedure{HillClimbing}{problem} returns a state that is a local maximum
+        \State current = problem.Initial
+        \While {true}
+        \State neighbor = a highest-valued successor state of current
+        \If {Value(neighbor) <= Value(current)}
+        \State \Return current
+        \EndIf
+        \State current = neighbor
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+爬山法解决N皇后问题时，利用评估函数（导致皇后冲突的对数）来评估皇后摆放位置的好坏。\\
+
+例如对于4皇后，初始状况皇后都位于第1行中，皇后可以被移动到每列的任意位置上。\\
+
+爬山法对每个皇后能够移动的位置进行评估，例如-4代表该列的皇后移到到该位置后，会有4对皇后产生冲突。
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+        \matrix[matrix of nodes,nodes={inner sep=0pt,text width=1cm,align=center,minimum height=1cm}]{
+            \symqueen & \symqueen & \symqueen & \symqueen                  \\
+            -4        & -5        & -5        & -4                         \\
+            -4        & -4        & -4        & -4                         \\
+            -4        & -3        & -3        & -4\\};
+    \end{tikzpicture}
+\end{figure}
+
+依次选择评估值最大的位置，将对应列的皇后移到该位置。
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+        \matrix[matrix of nodes,nodes={inner sep=0pt,text width=1cm,align=center,minimum height=1cm}]{
+            \symqueen & -6        & \symqueen & \symqueen                  \\
+            -1        & -5        & -2        & -3                         \\
+            -3        & -4        & -3        & -1                         \\
+            -3        & \symqueen & -2        & -3\\};
+    \end{tikzpicture}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+        \matrix[matrix of nodes,nodes={inner sep=0pt,text width=1cm,align=center,minimum height=1cm}]{
+                      &           & \symqueen & \symqueen                \\
+            \symqueen &           &           &                          \\
+                      &           &           & 0                        \\
+                      & \symqueen &           & \\};
+    \end{tikzpicture}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+        \matrix[matrix of nodes,nodes={inner sep=0pt,text width=1cm,align=center,minimum height=1cm}]{
+                      &           & \symqueen &                          \\
+            \symqueen &           &           &                          \\
+                      &           &           & \symqueen                \\
+                      & \symqueen &           & \\};
+    \end{tikzpicture}
+\end{figure}
+
+爬山法还有很多变体：
+
+\begin{itemize}
+    \item 随机爬山法（Stochastic Hill-Climbing）：随机选择比当前结点更优的后继结点。
+    \item 首选爬山法（First-Choice Hill-Climbing）：选择第一个比当前结点更优的后继结点。
+    \item 随机重新开始爬山法（Random Restart Hill-Climbing）：通过随机生成的初始状态来进行一系列的爬山法搜索，找到目标时停止搜索。
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection{模拟退火（Simulated Annealing）}
+
+模拟退火是一个由金属退火启发的算法。在物理应用中分子排布可能是紊乱的，如果我们将它升温然后缓慢降温，就可以生成完美的晶形。\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/C1/1-6/2.png}
+    \caption{物理退火}
+\end{figure}
+
+模拟退火算法也是一种局部搜索算法，它的思想是在初始状态下，随机生成一个解，然后在解的邻域中随机选择一个解，如果该解比当前解更好，就接受该解，否则以一定的概率接受该解。\\
+
+例如在计算最小值的问题中，如果新解比当前解更小，就接受该解，否则以一定的概率接受该解，这个概率随着温度的降低而减小。
+
+\vspace{-1cm}
+
+\begin{align*}
+     & \Delta E = Value(current) - Value(next)
+\end{align*}
+
+\begin{enumerate}
+    \item 如果$ \Delta E > 0 $：以概率为1接受新解
+    \item 否则：以概率为$ e^{\Delta E \over T} $接受新解
+\end{enumerate}
+
+其中$ T $表示温度，会随着时间（算法的迭代）逐渐降低。接受解的概率会因$ T $受到影响：
+
+\vspace{-1cm}
+
+\begin{align*}
+    \lim_{T \rightarrow \infty} P(\text{Acceptance of bad move}) & = 1 \\
+    \lim_{T \rightarrow 0} P(\text{Acceptance of bad move})      & = 0
+\end{align*}
+
+\begin{algorithm}[H]
+    \caption{SimulatedAnnealing}
+    \begin{algorithmic}[1]
+        \Procedure{SimulatedAnnealing}{problem, schedule} returns a solution state
+        \State current = problem.Initial
+        \For {t = 1 to $ \infty $}
+        \State T = schedule(t)
+        \If {T = 0}
+        \State \Return current
+        \EndIf
+        \\
+        \State next = problem.RandomSuccessor(current)
+        \State $ \Delta E $ = Value(current) - Value(next)
+        \If {$ \Delta E $ > 0}
+        \State current = next
+        \Else
+        \State current = next with probability $ e^{\Delta E \over T} $
+        \EndIf
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
