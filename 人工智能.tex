@@ -33,6 +33,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{skak}
+\usepackage{sudoku}
 
 \usetikzlibrary{calc,positioning,arrows,fit,shapes}
 \usetikzlibrary{shapes.multipart,chains}
@@ -41,6 +42,37 @@
 \usetikzlibrary{matrix,backgrounds}
 \usetikzlibrary{automata}
 \usetikzlibrary{scopes}
+
+\makeatletter
+\newcommand*\@shidoku@grid{
+  \linethickness{\sudokuthinline}
+  \multiput(0,0)(1,0){5}{\line(0,1){4}}
+  \multiput(0,0)(0,1){5}{\line(1,0){4}}
+  \linethickness{\sudokuthickline}
+  \multiput(0,0)(2,0){2}{\line(0,1){4}}
+  \multiput(0,0)(0,2){2}{\line(1,0){4}}
+  \linethickness{0.5\sudokuthickline}
+  \put(0,0){\framebox(0,0){}}
+  \put(4,0){\framebox(0,0){}}
+  \put(0,4){\framebox(4,0){}}
+  \put(4,0){\framebox(0,4){}}
+}
+
+\newenvironment{shidoku-block}{
+        \catcode`\|=\active
+        \@sudoku@activate
+        \setcounter{@sudoku@col}{-1}
+        \setcounter{@sudoku@row}{3}
+        \setlength\unitlength{.111111\sudokusize}
+        \begin{picture}(4,4)
+        \@shidoku@grid\@shidoku@grab@arguments
+        }{\end{picture}}
+
+\def\@shidoku@grab@arguments#1.#2.#3.#4.{\scantokens{#1.#2.#3.#4.}}
+\newenvironment{shidoku}{
+        \begin{center}
+        \begin{shidoku-block}}{\end{shidoku-block}\end{center}}
+\makeatother
 
 \tikzset{
 	->,
