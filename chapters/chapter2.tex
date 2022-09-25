@@ -127,5 +127,69 @@ CSP问题包含：
 
 \section{约束传播}
 
-\subsection{约束传播（Constrain Propagation）}
+\subsection{弧一致性（Arc Consistency）}
 
+约束传播（Constrain Propagation）的目的是减少变量的合法取值，有时如果所有变量的域都被减少为1时，它可以直接算出结果。约束传播还可以检测失败的情况，当某一个变量的域被减少为0时，该问题将无解。\\
+
+如果变量$ X_i $的域$ D_i $中的每个值都满足在变量$ X_j $的域$ D_j $中的值时，称$ X_i $和$ X_j $是弧一致的。\\
+
+例如：
+
+\begin{itemize}
+    \item 变量：$ X, Y $
+    \item 域：$ dom(X) = dom(Y) = \{1, \cdots, 9\} $
+    \item 约束：$ Y = X^2 $
+\end{itemize}
+
+当变量$ X $取$ \{4, 5, 6, 7, 8, 9\} $时，$ X $与$ Y $不满足弧一致性。\\
+
+当变量$ Y $取$ \{2, 3, 5, 6, 7, 8\} $时，$ Y $与$ X $不满足弧一致性。\\
+
+为了让$ X $和$ Y $都互相满足弧一致性，需要从$ dom(X) $和$ dom(Y) $中移除不满足弧一致性的值。因此
+
+\vspace{-1cm}
+
+\begin{align*}
+    dom(X) = \{0, 1, 2, \cdots, 9\}\ \backslash \ \{4, 5, 6, 7, 8, 9\} = \{0, 1, 2, 3\} \\
+    dom(Y) = \{0, 1, 2, \cdots, 9\}\ \backslash \ \{2, 3, 5, 6, 7, 8\} = \{0, 1, 4, 9\}
+\end{align*}
+
+AC-3（Arc Consistency-3）算法用于解决CSP问题，早期的AC算法效率太低，而AC-3更为简单常用。\\
+
+\begin{algorithm}[H]
+    \caption{AC-3}
+    \begin{algorithmic}[1]
+        \Procedure{AC-3}{csp} returns false if inconsistency found and true otherwise
+        \State queue = [all arcs in csp]
+        \\
+        \While {not queue.is\_empty()}
+        \State $ (X_i, X_j) $ = queue.dequeue()
+        \If {Revise(csp, $ X_i $, $ X_j $)}
+        \If {size($ D_i $) == 0}
+        \State \Return false
+        \EndIf
+        \For {$ X_k $ in $ X_i $.Neighbors - \{$ X_j $\}}
+        \State queue.enqueue($ (X_i, X_j) $)
+        \EndFor
+        \EndIf
+        \EndWhile
+        \\
+        \State \Return true
+        \EndProcedure
+        \\
+        \Procedure{Revise}{csp, $ X_i $, $ X_j $} returns true iff we revise the domain of $ X_i $
+        \State revised = false
+        \For {$ x $ in $ D_i $}
+        \If {no value $ y $ in $ D_j $ allows (x, y) to satisfy contraint $ (X_i, X_j) $}
+        \State delete $ x $ from $ D_i $
+        \State revised = true
+        \EndIf
+        \EndFor
+        \State \Return revised
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\section{}
