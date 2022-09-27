@@ -127,11 +127,11 @@ CSP问题包含：
 
 \section{约束传播}
 
-\subsection{弧一致性（Arc Consistency）}
+\subsection{弧相容（Arc Consistency）}
 
 约束传播（Constrain Propagation）的目的是减少变量的合法取值，有时如果所有变量的域都被减少为1时，它可以直接算出结果。约束传播还可以检测失败的情况，当某一个变量的域被减少为0时，该问题将无解。\\
 
-如果变量$ X_i $的域$ D_i $中的每个值都满足在变量$ X_j $的域$ D_j $中的值时，称$ X_i $和$ X_j $是弧一致的。\\
+如果变量$ X_i $的域$ D_i $中的每个值都满足在变量$ X_j $的域$ D_j $中的值时，称$ X_i $和$ X_j $是弧相容的。\\
 
 例如：
 
@@ -141,11 +141,11 @@ CSP问题包含：
     \item 约束：$ Y = X^2 $
 \end{itemize}
 
-当变量$ X $取$ \{4, 5, 6, 7, 8, 9\} $时，$ X $与$ Y $不满足弧一致性。\\
+当变量$ X $取$ \{4, 5, 6, 7, 8, 9\} $时，$ X $与$ Y $不满足弧相容。\\
 
-当变量$ Y $取$ \{2, 3, 5, 6, 7, 8\} $时，$ Y $与$ X $不满足弧一致性。\\
+当变量$ Y $取$ \{2, 3, 5, 6, 7, 8\} $时，$ Y $与$ X $不满足弧相容。\\
 
-为了让$ X $和$ Y $都互相满足弧一致性，需要从$ dom(X) $和$ dom(Y) $中移除不满足弧一致性的值。因此
+为了让$ X $和$ Y $都互相满足弧相容，需要从$ dom(X) $和$ dom(Y) $中移除不满足弧相容的值。因此
 
 \vspace{-1cm}
 
@@ -192,4 +192,110 @@ AC-3（Arc Consistency-3）算法用于解决CSP问题，早期的AC算法效率
 
 \newpage
 
-\section{}
+\section{回溯搜索}
+
+\subsection{回溯搜索（Backtracking Search）}
+
+回溯就是简单粗暴的试错方法。例如走迷宫，大多人类一般就是使用回溯法，当走到一条死路，就往回退到前一个岔路，尝试另外一条，直到走出。\\
+
+回溯搜索与DFS类似，回溯搜索每次为变量选择一个赋值，当没有合法的值可以赋给该变量时就回溯返回，尝试别的路径。\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/C2/2-3/1.png}
+    \caption{回溯搜索}
+\end{figure}
+
+\begin{algorithm}[H]
+    \caption{Backtracking Search}
+    \begin{algorithmic}[1]
+        \Procedure{BacktrackingSearch}{csp} returns a solution or failure
+        \State \Return Backtrack(csp, \{\})
+        \EndProcedure
+        \\
+        \Procedure{Backtrack}{csp, assignment} returns a solution or failure
+        \If {assignment is complete}
+        \State \Return assignment
+        \EndIf
+        \\
+        \State var = SelectUnassignedVariable(csp, assignment)
+        \For {value in OrderDomainValues(csp, var, assignment)}
+        \If {value is consistent with assignment}
+        \State assignment.add({var = value})
+        \State inferences = Inference(csp, var, assignment)
+        \If {inferences != failure}
+        \State csp.add(inferences)
+        \State result = Backtrack(csp, assignment)
+        \If {result != failure}
+        \State \Return result
+        \EndIf
+        \State csp.remove(inferences)
+        \EndIf
+        \State assignment.remove({var = value})
+        \EndIf
+        \EndFor
+        \\
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\vspace{0.5cm}
+
+\subsection{前向检查（Forward Checking）}
+
+前向检查可用于将还没有进行赋值的候选变量进行适当排除。\\
+
+在澳大利亚地图着色问题中，一开始，所有省份的颜色都能够选择所有域中的颜色。\\
+
+当WA选择了红色后，相邻的NT和SA的颜色域就需要删除红色。当Q选择了绿色后，相邻的NT、NSW和SA的颜色域就需要删除绿色。当V选择了蓝色后，相邻的NSW和SA的颜色域就需要删除蓝色。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/C2/2-3/2.png}
+    \caption{前向检查}
+\end{figure}
+
+此时发现，SA的颜色域为空，说明当前的选择不合法，需要回溯。\\
+
+\subsection{变量和取值顺序}
+
+变量和取值顺序可以对回溯搜索进行优化，从而减少搜索空间。\\
+
+一个常用的选择标准是最小剩余值（Minimum Remaining Values），也就是选择域中包含选择最少的变量。在每次给当前的变量赋值之后，其它变量的域可能会更新，那么包含元素最少的变量，就代表这个变量的域可能最早变为空，从而产生死结点。\\
+
+最小剩余值的排序方法认为，既然问题迟早可能暴露，那就选择一种可以让问题尽早暴露的方式。这种方式也被称为Fail-First。\\
+
+最小剩余值是基于变量进行选择的，而另一种最小约束值（Least Constraining Value）讨论的是当一个变量被选定时，从其域中选择哪个值的方式。\\
+
+最少约束值优先选择的值应该试图为剩余变量赋值留下最大的空间。因为在CSP问题中，无论如何都要对所有的变量进行值的分配，因此必须把困难的变量情况放在前面进行讨论，这样可以提前暴露问题，触发回溯行为，避免不必要的计算。但是对于每个变量的值的选择来说，并不是每个值都会用到，因此只需要选择最有效的值即可。\\
+
+\newpage
+
+\section{CSP局部搜索}
+
+\subsection{CSP局部搜索}
+
+回溯搜索从一个空的初始状态开始，逐个尝试对变量赋值，当选择不合法时就进行回溯，因此回溯搜索始终保持弧相容。\\
+
+局部搜索算法对求解许多CSP都是很有效的，它从一个完整地随机布局开始，这个初始布局有可能会违反约束，局部搜索的目的就是消除这些矛盾。在为变量选择新值的时候，最明显的启发式是选择与其它变量冲突最少的值。\\
+
+\begin{algorithm}[H]
+    \caption{MinConflicts}
+    \begin{algorithmic}[1]
+        \Procedure{MinConflicts}{csp, max\_steps} returns a solution or failure
+        \State current = an initial complete assignment for csp
+        \For {i = 1 to max\_steps}
+        \If {current is a solution for csp}
+        \State \Return current
+        \EndIf
+        \State var = a randomly chosen conflicted variable from csp.Variables
+        \State value = the value v for var that minimizes Conflicts(csp, var, v, current)
+        \State current.update({var = value})
+        \EndFor
+        \State \Return failure
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
