@@ -436,21 +436,103 @@ AI企图了解智能的实质，并生产出一种新的能以人类智能相似
 
 在八数码（8-puzzle）问题中，在一个3*3的方格中，有数字1~8和一个空白，最终需要将数字依次排列，使空白位于最后的位置。\\
 
-八数码问题一共存在$ 9! = 362880 $种状态，其中初始状态为任意一种摆放布局，目标状态为依次排列的布局。
+八数码问题一共存在$ 9! = 362880 $种状态，其中初始状态为任意一种摆放布局，目标状态为依次排列的布局。\\
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{img/C1/1-3/1.png}
+    \begin{tikzpicture}
+        \node at (1.5,3.5) {State 1};
+        \draw (0,0) rectangle (3,3);
+        \draw[-] (0,1) -- (3,1);
+        \draw[-] (0,2) -- (3,2);
+        \draw[-] (1,0) -- (1,3);
+        \draw[-] (2,0) -- (2,3);
+
+        \node at (0.5,2.5) {2};
+        \node at (1.5,2.5) {7};
+        \node at (2.5,2.5) {4};
+        \node at (0.5,1.5) {5};
+        \node at (2.5,1.5) {8};
+        \node at (0.5,0.5) {3};
+        \node at (1.5,0.5) {1};
+        \node at (2.5,0.5) {6};
+
+        \node at (5.5,3.5) {State 2};
+        \draw (4,0) rectangle (7,3);
+        \draw[-] (4,1) -- (7,1);
+        \draw[-] (4,2) -- (7,2);
+        \draw[-] (5,0) -- (5,3);
+        \draw[-] (6,0) -- (6,3);
+
+        \node at (4.5,2.5) {2};
+        \node at (5.5,2.5) {7};
+        \node at (6.5,2.5) {4};
+        \node at (5.5,1.5) {5};
+        \node at (6.5,1.5) {8};
+        \node at (4.5,0.5) {3};
+        \node at (5.5,0.5) {1};
+        \node at (6.5,0.5) {6};
+
+        \node at (8,1.5) {......};
+
+        \node at (10.5,3.5) {State 362880};
+        \draw (9,0) rectangle (12,3);
+        \draw[-] (9,1) -- (12,1);
+        \draw[-] (9,2) -- (12,2);
+        \draw[-] (10,0) -- (10,3);
+        \draw[-] (11,0) -- (11,3);
+
+        \node at (9.5,2.5) {1};
+        \node at (10.5,2.5) {2};
+        \node at (11.5,2.5) {3};
+        \node at (9.5,1.5) {4};
+        \node at (10.5,1.5) {5};
+        \node at (11.5,1.5) {6};
+        \node at (9.5,0.5) {7};
+        \node at (10.5,0.5) {8};
+    \end{tikzpicture}
 \end{figure}
 
 行为包括可以将空白进行上移（U）、下移（D）、左移（L）、右移（R），每次移动的代价可以认为都为1，例如对初始状态中的空白进行左移，其状态转移可表示为$ s_2 = Result(s_1, L) $。\\
 
-在罗马尼亚地图（Romania map）中，例如初始位置位于Arad，最终想要到达Bucharest。问题的状态为所有的城市，每次行动的代价为城市见的距离。
+在罗马尼亚地图（Romania map）中，例如初始位置位于Arad，最终想要到达Bucharest。问题的状态为所有的城市，每次行动的代价为城市见的距离。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[fill=brown] (0,0) rectangle (0.3,0.3) node[above] {Fagaras};
+        \draw[fill=brown] (-3,0) rectangle (-2.7,0.3) node[above] {Sibiu};
+        \draw[fill=brown] (-4,4) rectangle (-3.7,4.3) node[above] {Oradea};
+        \draw[fill=brown] (-5,3) node[left] {Zerind} rectangle (-4.7,3.3);
+        \draw[fill=brown] (-6,2) node[left] {Arad} rectangle (-5.7,2.3);
+        \draw[fill=brown] (-6,-2) node[left] {Timisoara} rectangle (-5.7,-1.7);
+        \draw[fill=brown] (-5,-3) node[left] {Lugoj} rectangle (-4.7,-2.7);
+        \draw[fill=brown] (-5,-5) node[left] {Mehadia} rectangle (-4.7,-4.7);
+        \draw[fill=brown] (-5,-7) node[left] {Drobeta} rectangle (-4.7,-6.7);
+        \draw[fill=brown] (-2,-2) node[left] {Rimnicu Vilcea} rectangle (-1.7,-1.7);
+        \draw[fill=brown] (0,-4) rectangle (0.3,-3.7) node[above] {Pitesti};
+        \draw[fill=brown] (-1,-7) node[below] {Craiova} rectangle (-0.7,-6.7);
+        \draw[fill=brown] (3,-5) node[left] {Bucharest} rectangle (3.3,-4.7);
+        \draw[fill=brown] (2,-7) node[below] {Giurgiu} rectangle (2.3,-6.7);
+        \draw[fill=brown] (4,-4) node[left] {Urziceni} rectangle (4.3,-3.7);
+        \draw[fill=brown] (6,-4) rectangle (6.3,-3.7) node[above] {Hirsova};
+        \draw[fill=brown] (7,-6) node[below] {Eforie} rectangle (7.3,-5.7);
+        \draw[fill=brown] (5,0) rectangle (5.3,0.3) node[right] {Vaslui};
+        \draw[fill=brown] (4,3) rectangle (4.3,3.3) node[above] {Iasi};
+        \draw[fill=brown] (2,5) rectangle (2.3,5.3) node[above] {Neamt};
+
+        \draw[-] (0,0.15) -- (-1.35,0.15) node[above] {99} -- (-2.7,0.15) ;
+        \draw[-] (-3,0.15) -- (-3.7,4) node[xshift=0.5cm, yshift=-2cm, right] {151};
+        \draw[-] (-4,4) -- (-4.7,3.3) node[yshift=0.5cm, left] {71};
+        \draw[-] (-5,3) -- (-5.7,2.3) node[xshift=0.5cm, yshift=0.2cm, right] {75};
+        \draw[-] (-5.7,2.3) -- (-3,0.15) node[xshift=-2cm, yshift=0.7cm, above] {140};
+    \end{tikzpicture}
+    \caption{罗马尼亚地图}
+\end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics{img/C1/1-3/2.png}
-    \caption{罗马尼亚地图}
 \end{figure}
 
 \vspace{0.5cm}
