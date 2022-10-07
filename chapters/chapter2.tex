@@ -38,7 +38,36 @@ CSP问题包含：
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.45]{img/C2/2-1/1.png}
+    \includegraphics{img/C2/2-1/1.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{scope}[every node/.style={circle,thick,draw}]
+            \node (NT) at (-1.5,2) {NT};
+            \node (Q) at (1.5,2) {Q};
+            \node (WA) at (-4,0) {WA};
+            \node (SA) at (0,0) {SA};
+            \node (NSW) at (4,0) {NSW};
+            \node (V) at (1.5,-2) {V};
+            \node (T) at (1.5,-4) {T};
+        \end{scope}
+
+        \begin{scope}[>={Stealth[black]},
+            every node/.style={},
+            every edge/.style={draw=black,very thick}]
+            \path [-] (NT) edge node {} (Q);
+            \path [-] (NT) edge node {} (SA);
+            \path [-] (Q) edge node {} (SA);
+            \path [-] (Q) edge node {} (NSW);
+            \path [-] (WA) edge node {} (NT);
+            \path [-] (SA) edge node {} (WA);
+            \path [-] (SA) edge node {} (NSW);
+            \path [-] (SA) edge node {} (V);
+            \path [-] (NSW) edge node {} (V);
+        \end{scope}
+    \end{tikzpicture}
     \caption{澳大利亚地图}
 \end{figure}
 
