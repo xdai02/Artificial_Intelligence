@@ -175,7 +175,7 @@ Minimax是一种递归算法，用于在博弈树中找到最优行动，其中M
         \\
         \Procedure{MaxValue}{game, state} returns a (utility, move) pair
         \If {game.IsTermial(state)}
-        \Return game.Utility(state, player), null
+        \State \Return game.Utility(state, player), null
         \EndIf
         \State v = $ - \infty $
         \For {a in game.Actions(state)}
@@ -189,7 +189,7 @@ Minimax是一种递归算法，用于在博弈树中找到最优行动，其中M
         \\
         \Procedure{MinValue}{game, state} returns a (utility, move) pair
         \If {game.IsTermial(state)}
-        \Return game.Utility(state, player), null
+        \State \Return game.Utility(state, player), null
         \EndIf
         \State v = $ + \infty $
         \For {a in game.Actions(state)}
@@ -203,3 +203,288 @@ Minimax是一种递归算法，用于在博弈树中找到最优行动，其中M
     \end{algorithmic}
 \end{algorithm}
 
+例如有一个只有一个回合的游戏，MAX先进行行动：
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A};
+    \end{tikzpicture}
+\end{figure}
+
+MAX需要从当前状态$ A $中选择一个能使效用最大的行动。根据深度优先搜索的策略，首先选择$ A $的第一个子结点$ B $。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A}
+        child {
+                node[circle,draw] {B}
+            }
+        child {}
+        child {};
+    \end{tikzpicture}
+\end{figure}
+
+状态$ B $为MIN的回合，因此需要从$ B $中选择一个能使效用最小的行动。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A}
+        child {
+                node[circle,draw] (B) {B}
+                child {node[circle,draw,fill=red] (E) {E}}
+                child {node[circle,draw] (F) {F}}
+                child {node[circle,draw] (G) {G}}
+            }
+        child {}
+        child {};
+
+        \node[above, yshift=0.5cm] at (B) {3};
+        \node[below, yshift=-0.5cm] at (E) {3};
+        \node[below, yshift=-0.5cm] at (F) {12};
+        \node[below, yshift=-0.5cm] at (G) {8};
+    \end{tikzpicture}
+\end{figure}
+
+同样，再从$ A $的剩余两个子结点$ C $和$ D $中，计算计算能使MIN效用最小的行动。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A}
+        child {
+                node[circle,draw] (B) {B}
+                child {node[circle,draw,fill=red] (E) {E}}
+                child {node[circle,draw] (F) {F}}
+                child {node[circle,draw] (G) {G}}
+            }
+        child {
+                node[circle,draw] (C) {C}
+                child {node[circle,draw,fill=red] (H) {H}}
+                child {node[circle,draw] (I) {I}}
+                child {node[circle,draw] (J) {J}}
+            }
+        child {
+                node[circle,draw] (D) {D}
+                child {node[circle,draw] (K) {K}}
+                child {node[circle,draw] (L) {L}}
+                child {node[circle,draw,fill=red] (M) {M}}
+            };
+
+        \node[above, yshift=0.5cm] at (B) {3};
+        \node[below, yshift=-0.5cm] at (E) {3};
+        \node[below, yshift=-0.5cm] at (F) {12};
+        \node[below, yshift=-0.5cm] at (G) {8};
+
+        \node[right, yshift=0.8cm] at (C) {2};
+        \node[below, yshift=-0.5cm] at (H) {2};
+        \node[below, yshift=-0.5cm] at (I) {4};
+        \node[below, yshift=-0.5cm] at (J) {6};
+
+        \node[right, yshift=0.8cm] at (D) {2};
+        \node[below, yshift=-0.5cm] at (K) {14};
+        \node[below, yshift=-0.5cm] at (L) {5};
+        \node[below, yshift=-0.5cm] at (M) {2};
+    \end{tikzpicture}
+\end{figure}
+
+最后，MAX从$ A $的三个子结点中选择一个能使效用最大的行动。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A}
+        child {
+                node[circle,draw,fill=red] (B) {B}
+                child {node[circle,draw] (E) {E}}
+                child {node[circle,draw] (F) {F}}
+                child {node[circle,draw] (G) {G}}
+            }
+        child {
+                node[circle,draw] (C) {C}
+                child {node[circle,draw] (H) {H}}
+                child {node[circle,draw] (I) {I}}
+                child {node[circle,draw] (J) {J}}
+            }
+        child {
+                node[circle,draw] (D) {D}
+                child {node[circle,draw] (K) {K}}
+                child {node[circle,draw] (L) {L}}
+                child {node[circle,draw] (M) {M}}
+            };
+
+        \node[above, yshift=0.5cm] at (B) {3};
+        \node[below, yshift=-0.5cm] at (E) {3};
+        \node[below, yshift=-0.5cm] at (F) {12};
+        \node[below, yshift=-0.5cm] at (G) {8};
+
+        \node[right, yshift=0.8cm] at (C) {2};
+        \node[below, yshift=-0.5cm] at (H) {2};
+        \node[below, yshift=-0.5cm] at (I) {4};
+        \node[below, yshift=-0.5cm] at (J) {6};
+
+        \node[right, yshift=0.8cm] at (D) {2};
+        \node[below, yshift=-0.5cm] at (K) {14};
+        \node[below, yshift=-0.5cm] at (L) {5};
+        \node[below, yshift=-0.5cm] at (M) {2};
+    \end{tikzpicture}
+\end{figure}
+
+\begin{itemize}
+    \item 时间复杂度：$ O(b^m) $
+    \item 空间复杂度：$ O(bm) $ or $ O(m) $
+    \item 完备性：YES（当博弈树有穷时）
+    \item 最优性：YES
+\end{itemize}
+
+Minimax的时间复杂度是指数级的，因此并不适合求解复杂的游戏，如象棋（约有$ 35^{80} $个状态）、围棋（约有$ 350^{150} $个状态）等。
+\newpage
+
+\section{Alpha-Beta剪枝}
+
+\subsection{Alpha-Beta剪枝（Alpha-Beta Pruning）}
+
+为了减少Minimax搜索的计算量，Alpha-Beta剪枝算法可用于裁剪掉博弈树中没有必要的分支。\\
+
+例如在这棵博弈树中，结点$ I $和$ J $可以被裁剪掉。\\
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+            level distance=2cm,
+            level 1/.style={sibling distance=5cm},
+            level 2/.style={sibling distance=1.5cm},
+            level 3/.style={sibling distance=1cm}
+        ]
+        \node[circle,draw] {A}
+        child {
+                node[circle,draw] (B) {B}
+                child {node[circle,draw] (E) {E}}
+                child {node[circle,draw] (F) {F}}
+                child {node[circle,draw] (G) {G}}
+            }
+        child {
+                node[circle,draw] (C) {C}
+                child {node[circle,draw] (H) {H}}
+                child {node[circle,draw,fill=gray] (I) {I}}
+                child {node[circle,draw,fill=gray] (J) {J}}
+            }
+        child {
+                node[circle,draw] (D) {D}
+                child {node[circle,draw] (K) {K}}
+                child {node[circle,draw] (L) {L}}
+                child {node[circle,draw] (M) {M}}
+            };
+
+        \node[below, yshift=-0.5cm] at (E) {3};
+        \node[below, yshift=-0.5cm] at (F) {12};
+        \node[below, yshift=-0.5cm] at (G) {8};
+
+        \node[below, yshift=-0.5cm] at (H) {2};
+        \node[below, yshift=-0.5cm] at (I) {4};
+        \node[below, yshift=-0.5cm] at (J) {6};
+
+        \node[below, yshift=-0.5cm] at (K) {14};
+        \node[below, yshift=-0.5cm] at (L) {5};
+        \node[below, yshift=-0.5cm] at (M) {2};
+    \end{tikzpicture}
+\end{figure}
+
+因为在对$ B $结点的子树搜索后，将会计算得出MIN在$ B $结点的最小值为$ 3 $。然后在对结点$ C $的搜索中，$ C $的第一个子结点为$ 2 $。由于MIN只会选择其中的最小值，而MAX只会根据这些最小值中的最大值，即：
+
+\vspace{-1cm}
+
+\begin{align*}
+    Minimax(root) & = max(min(3, 12, 8), min(2, x, y), min(14, 5, 2)) \\
+                  & = max(3, min(2, x, y), 14)                        \\
+                  & = 3
+\end{align*}
+
+因此Alpha-Beta剪枝在搜索完结点$ H $后，没有必要继续对$ I $和$ J $再进行搜索了。\\
+
+\begin{algorithm}[H]
+    \caption{AlphaBetaPruning}
+    \begin{algorithmic}[1]
+        \Procedure{AlphaBetaSearch}{game, state} returns an action
+        \State player = game.ToMove(state)
+        \State value, move = MaxValue(game, state, $ -\infty $, $ +\infty $)
+        \State \Return move
+        \EndProcedure
+        \\
+        \Procedure{MaxValue}{game, state, $ \alpha $, $ \beta $} returns a (utility, move) pair
+        \If {game.IsTermial(state)}
+        \State \Return game.Utility(state, player), null
+        \EndIf
+        \State v = $ - \infty $
+        \For {a in game.Actions(state)}
+        \State v2, a2 = MinValue(game, game.Result(state, a))
+        \If {v2 > v}
+        \State v, move = v2, a
+        \State $ \alpha $ = max($ \alpha $, v)
+        \EndIf
+        \If {v >= $ \beta $}
+        \State \Return v, move
+        \EndIf
+        \EndFor
+        \State \Return v, move
+        \EndProcedure
+        \\
+        \Procedure{MinValue}{game, state, $ \alpha $, $ \beta $} returns a (utility, move) pair
+        \If {game.IsTermial(state)}
+        \State \Return game.Utility(state, player), null
+        \EndIf
+        \State v = $ + \infty $
+        \For {a in game.Actions(state)}
+        \State v2, a2 = MaxValue(game, game.Result(state, a))
+        \If {v2 < v}
+        \State v, move = v2, a
+        \State $ \beta $ = min($ \beta $, v)
+        \EndIf
+        \If {v <= $ \alpha $}
+        \State \Return v, move
+        \EndIf
+        \EndFor
+        \State \Return v, move
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{itemize}
+    \item 时间复杂度：
+          \begin{itemize}
+              \item 随机行动顺序：$ O(b^{3m \over 4}) $
+              \item 最佳行动顺序（启发式算法）：$ O(b^{m \over 2}) $
+          \end{itemize}
+    \item 空间复杂度：$ O(m) $
+    \item 完备性：YES（当博弈树有穷时）
+    \item 最优性：YES
+\end{itemize}
+
+\newpage
