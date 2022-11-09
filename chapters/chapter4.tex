@@ -1,0 +1,291 @@
+\chapter{逻辑Agent}
+
+\section{命题逻辑}
+
+\subsection{命题逻辑（Propositional Logic）}
+
+逻辑（logic）规则给出数学语句的准确含义，这些规则用来区分有效和无效的数学论证。逻辑不仅对理解数学推理十分重要，而且在计算机科学中有许多应用，逻辑可用于电路设计、程序构造、程序正确性证明等方面。\\
+
+命题是逻辑的基本成分，一个命题是一个具有真值（truth value）的语句，命题可以为真也可以为假，但不能既为真又为假。\\
+
+命题习惯上用字母$ p $, $ q $, $ r $, $ s $等来表示，如果一个命题是真命题，它的真值为真，用T表示；如果一个命题是假命题，它的真值为假，用F表示。\\
+
+\subsection{逻辑运算符}
+
+非运算符$ \neg $只作用于一个命题，其作用是反转命题的真值。\\
+
+真值表（truth table）可以给出命题真值之间的关系，在确定由简单命题组成的命题的真值时，真值表特别有用。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ \neg p $} \\
+            \hline
+            T              & F                   \\
+            \hline
+            F              & T                   \\
+            \hline
+        \end{tabular}
+    }
+    \caption{NOT真值表}
+\end{table}
+
+命题$ p \wedge q $表示$ p $并且$ q $，当$ p $和$ q $都为真时命题为真，否则为假。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ q $} & \textbf{$ p \wedge q $} \\
+            \hline
+            T              & T              & T                       \\
+            \hline
+            T              & F              & F                       \\
+            \hline
+            F              & T              & F                       \\
+            \hline
+            F              & F              & F                       \\
+            \hline
+        \end{tabular}
+    }
+    \caption{AND真值表}
+\end{table}
+
+命题$ p \vee q $表示$ p $或$ q $，当$ p $和$ q $都为假时命题为假，否则为真。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ q $} & \textbf{$ p \vee q $} \\
+            \hline
+            T              & T              & T                     \\
+            \hline
+            T              & F              & T                     \\
+            \hline
+            F              & T              & T                     \\
+            \hline
+            F              & F              & F                     \\
+            \hline
+        \end{tabular}
+    }
+    \caption{OR真值表}
+\end{table}
+
+命题$ p \rightarrow q $表示$ p $蕴含$ q $，在$ p $为真而$ q $为假时命题为假，否则为真。其中$ p $称为前提，$ q $称为结论。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ q $} & \textbf{$ p \rightarrow q $} \\
+            \hline
+            T              & T              & T                            \\
+            \hline
+            T              & F              & F                            \\
+            \hline
+            F              & T              & T                            \\
+            \hline
+            F              & F              & T                            \\
+            \hline
+        \end{tabular}
+    }
+    \caption{蕴含真值表}
+\end{table}
+
+表示$ p \rightarrow q $的术语有很多种，常见的有：
+
+\begin{itemize}
+    \item If $ p $, then $ q $.
+    \item $ p $ only if $ q $.
+    \item $ q $ is necessary for $ p $.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{img/C4/4-1/1.png}
+\end{figure}
+
+命题$ p \leftrightarrow q $表示$ p $双向蕴含$ q $，在$ p $和$ q $有相同的真值时命题为真，否则为假。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ q $} & \textbf{$ p \leftrightarrow q $} \\
+            \hline
+            T              & T              & T                                \\
+            \hline
+            T              & F              & F                                \\
+            \hline
+            F              & T              & F                                \\
+            \hline
+            F              & F              & T                                \\
+            \hline
+        \end{tabular}
+    }
+    \caption{双向蕴含真值表}
+\end{table}
+
+\vspace{0.5cm}
+
+\subsection{逻辑等价（Logical Equivalence）}
+
+两个不同的复合命题可能拥有完全相同的真值，则称这两个命题在逻辑上是等价的。如果无论复合命题中各个命题的真值是什么，复合命题的真值总是为真，这样的复合命题称为永真式（tautology）。如果真值永远为假的复合命题称为矛盾（contradiction）。
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{5mm}{
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{$ p $} & \textbf{$ \neg p $} & \textbf{$ p \vee \neg p $} & \textbf{$ p \wedge \neg p $} \\
+            \hline
+            T              & F                   & T                          & F                            \\
+            \hline
+            F              & T                   & T                          & F                            \\
+            \hline
+        \end{tabular}
+    }
+    \caption{逻辑等价}
+\end{table}
+
+如果复合命题$ s $和是$ r $逻辑等价的，可表示为$ s \equiv r $。只有当$ s \leftrightarrow r $是永真式时，$ s $和$ r $才是逻辑等价的。
+
+\begin{tcolorbox}
+    \mybox{Exercise}
+    使用真值表证明$ p \vee q \equiv \neg (\neg p \wedge \neg q) $
+    \begin{table}[H]
+        \centering
+        \setlength{\tabcolsep}{5mm}{
+            \begin{tabular}{|c|c|c|c|c|c|c|}
+                \hline
+                \textbf{$ p $} & \textbf{$ q $} & \textbf{$ p \vee q $} & \textbf{$ \neg p $} & \textbf{$ \neg q $} & \textbf{$ \neg p \wedge \neg q $} & \textbf{$ \neg (\neg p \wedge \neg q) $} \\
+                \hline
+                T              & T              & T                     & F                   & F                   & F                                 & T                                        \\
+                \hline
+                T              & F              & T                     & F                   & T                   & F                                 & T                                        \\
+                \hline
+                F              & T              & T                     & T                   & F                   & F                                 & T                                        \\
+                \hline
+                F              & F              & F                     & T                   & T                   & T                                 & F                                        \\
+                \hline
+            \end{tabular}
+        }
+    \end{table}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+
+\subsection{逻辑等价定理}
+
+\begin{tcolorbox}
+    \mybox{幂等律 Idempotent Laws}
+    \begin{align}
+        p \wedge p & \equiv p \\
+        p \vee p   & \equiv p
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{恒等律 Identity Laws}
+    \begin{align}
+        p \wedge T & \equiv p \\
+        p \vee F   & \equiv p
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{支配律 Domination Laws}
+    \begin{align}
+        p \vee T   & \equiv T \\
+        p \wedge F & \equiv F
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{双非律 Double Negation Law}
+    \begin{align}
+        \neg (\neg p) & \equiv p
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{交换律 Commutative Laws}
+    \begin{align}
+        p \wedge q & \equiv q \wedge p \\
+        p \vee q   & \equiv q \vee p
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{结合律 Associative Laws}
+    \begin{align}
+        (p \wedge q) \wedge r & \equiv p \wedge (q \wedge r) \\
+        (p \vee q) \vee r     & \equiv p \vee (q \vee r)
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{分配律 Distributive Laws}
+    \begin{align}
+        (p \wedge q) \wedge r & \equiv p \wedge (q \wedge r) \\
+        (p \vee q) \vee r     & \equiv p \vee (q \vee r)
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{德摩根律 De Morgan's Laws}
+    \begin{align}
+        \neg (p \wedge q) & \equiv \neg p \vee \neg q   \\
+        \neg (p \vee q)   & \equiv \neg p \wedge \neg q
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{吸收律 Absorption Laws}
+    \begin{align}
+        p \wedge (p \vee q) & \equiv p \\
+        p \vee (p \wedge q) & \equiv p
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{条件恒等}
+    \begin{align}
+        p \rightarrow q     & \equiv \neg p \vee q                              \\
+        p \leftrightarrow q & \equiv (p \rightarrow q) \wedge (q \rightarrow p)
+    \end{align}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \mybox{Exercise}
+    证明$ (p \vee q) \rightarrow p $永真
+    \begin{align*}
+         & (p \vee q) \rightarrow p           \\
+         & \equiv \neg (p \wedge q) \vee p    \\
+         & \equiv (\neg p \vee \neg q) \vee p \\
+         & \equiv (\neg q \vee \neg p) \vee p \\
+         & \equiv \neg q \vee (\neg p \vee p) \\
+         & \equiv \neg q \vee T               \\
+         & \equiv T
+    \end{align*}
+\end{tcolorbox}
+
+\newpage
+
+\section{逻辑Agent}
+
+\subsection{逻辑Agent}
+
+人类能够认识事物、认识环境的能力能够帮助与环境互动，更是证明人类的智力水平。这并不是借助纯粹的本能反射机制，而是一种推理过程。\\
+
+这种智力型的方法体现在逻辑型Agent，或称为基于知识的Agent（knowledge-based agents）上。逻辑型Agent能够形成关于对环境的描述，使用推理过程来决定下一步的行动。\\
+
+基于知识的Agent的核心能力是逻辑能力和推理能力，它必须能够将新语句添加到知识库和查询知识库现有已知内容的方法。\\
+

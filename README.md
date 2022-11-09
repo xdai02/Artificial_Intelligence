@@ -18,3 +18,7 @@
     - 3.1 对抗搜索
 	- 3.2 Minimax
 	- 3.3 Alpha-Beta剪枝
+
+- 第4章：逻辑Agent
+	- 4.1 命题逻辑
+	- 4.2 逻辑Agent
